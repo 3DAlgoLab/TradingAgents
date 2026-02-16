@@ -5,6 +5,7 @@ offering a more compact and optimizable alternative to the LangGraph version.
 """
 
 from .config import configure_dspy, get_lm, reset_dspy, quick_setup
+from . import signatures
 
 __version__ = "0.1.0"
 
@@ -13,4 +14,5 @@ __all__ = [
     "get_lm",
     "reset_dspy",
     "quick_setup",
+    "signatures",
 ]
