@@ -4,6 +4,8 @@ This package contains the DSPy-based agent implementations including:
 - Analyst agents (Market, Sentiment, News, Fundamentals)
 - Researcher agents (Bull, Bear, ResearchManager)
 - Trader and Risk agents
+- Portfolio Manager
+- Memory integration
 - Tool wrappers for data fetching
 
 Example:
@@ -20,6 +22,30 @@ from .analysts import (
     SentimentAnalyst,
     NewsAnalyst,
     FundamentalsAnalyst,
+)
+
+from .researchers import (
+    BullResearcher,
+    BearResearcher,
+    ResearchManager,
+    DebateRunner,
+)
+
+from .trader import Trader
+
+from .risk import (
+    AggressiveRisk,
+    ConservativeRisk,
+    NeutralRisk,
+    RiskManager,
+    RiskDebateRunner,
+)
+
+from .portfolio import PortfolioManager
+
+from .memory import (
+    MemoryWrapper,
+    create_memory_wrapper,
 )
 
 from .tools import (
@@ -44,6 +70,24 @@ __all__ = [
     "SentimentAnalyst",
     "NewsAnalyst",
     "FundamentalsAnalyst",
+    # Researcher agents
+    "BullResearcher",
+    "BearResearcher",
+    "ResearchManager",
+    "DebateRunner",
+    # Trader
+    "Trader",
+    # Risk agents
+    "AggressiveRisk",
+    "ConservativeRisk",
+    "NeutralRisk",
+    "RiskManager",
+    "RiskDebateRunner",
+    # Portfolio
+    "PortfolioManager",
+    # Memory
+    "MemoryWrapper",
+    "create_memory_wrapper",
     # Tools
     "get_stock_data",
     "get_indicators",
