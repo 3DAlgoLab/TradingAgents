@@ -81,6 +81,7 @@ class TradingAgentsGraph:
         debug=False,
         config: Dict[str, Any] = None,
         callbacks: Optional[List] = None,
+        recursion_limit: int = 150,
     ):
         """Initialize the trading agents graph with all necessary components.
 
@@ -170,7 +171,13 @@ class TradingAgentsGraph:
 
         # Initialize the graph setup component
         # This object builds the actual LangGraph with all nodes, edges, and conditional routing
-        self.conditional_logic = ConditionalLogic()
+        # Read debate rounds from config, with defaults
+        max_debate_rounds = self.config.get("max_debate_rounds", 1)
+        max_risk_discuss_rounds = self.config.get("max_risk_discuss_rounds", 1)
+        self.conditional_logic = ConditionalLogic(
+            max_debate_rounds=max_debate_rounds,
+            max_risk_discuss_rounds=max_risk_discuss_rounds,
+        )
         self.graph_setup = GraphSetup(
             self.quick_thinking_llm,  # LLM for quick tasks
             self.deep_thinking_llm,  # LLM for complex reasoning
@@ -184,7 +191,11 @@ class TradingAgentsGraph:
         )
 
         # Initialize supporting components
-        self.propagator = Propagator()  # Handles state initialization
+        # Use recursion_limit from config if available, otherwise use parameter
+        max_recur_limit = self.config.get("max_recur_limit", recursion_limit)
+        self.propagator = Propagator(
+            max_recur_limit=max_recur_limit
+        )  # Handles state initialization
         self.reflector = Reflector(self.quick_thinking_llm)  # Post-trade reflection
         self.signal_processor = SignalProcessor(
             self.quick_thinking_llm

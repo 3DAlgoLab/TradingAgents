@@ -19,6 +19,8 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
+from tradingagents.default_config import DEFAULT_CONFIG
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -141,6 +143,31 @@ def run_tradingagents_backtest(
     end_date: datetime,
 ) -> dict:
     """Run TradingAgents backtest."""
+    load_dotenv()
+    config = DEFAULT_CONFIG.copy()
+
+    # Configure which LLM models to use for different thinking tasks:
+    # - deep_think_llm: Used for complex reasoning (research debates, risk analysis)
+    # - quick_think_llm: Used for simpler tasks (data fetching, basic analysis)
+    config["deep_think_llm"] = (
+        "qwen/qwen3-coder-next"  # Model for complex reasoning tasks
+    )
+    config["quick_think_llm"] = "qwen/qwen3-coder-next"  # Model for quick/simple tasks
+
+    # Set the maximum number of debate rounds between bull/bear researchers
+    # Higher values = more thorough analysis but slower execution and higher API costs
+    config["max_debate_rounds"] = 1
+
+    # Configure which data vendors to use for fetching market data
+    # Options: "yfinance" (free, uses Yahoo Finance) or "alpha_vantage" (requires API key)
+    # Default uses yfinance which requires no additional API keys
+    config["data_vendors"] = {
+        "core_stock_apis": "yfinance",  # For basic stock price/volume data
+        "technical_indicators": "yfinance",  # For technical indicators (MACD, RSI, etc.)
+        "fundamental_data": "yfinance",  # For financial statements, fundamentals
+        "news_data": "yfinance",  # For news articles and sentiment data
+    }
+
     try:
         # Import TradingAgents
         from tradingagents.graph.trading_graph import TradingAgentsGraph
@@ -149,6 +176,8 @@ def run_tradingagents_backtest(
         trading_graph = TradingAgentsGraph(
             selected_analysts=["market", "social", "news", "fundamentals"],
             debug=False,
+            config=config,
+            recursion_limit=150,
         )
 
         result = backtester.run_tradingagents_backtest(

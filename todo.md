@@ -59,3 +59,22 @@ The original codebase lacks any backtesting infrastructure. A comprehensive revi
 2. Implement DSPy-based trading agents
 3. Conduct comparative analysis between LangGraph and DSPy implementations using the backtesting infrastructure
 4. Iterate and optimize DSPy implementation to meet or exceed LangGraph performance benchmarks
+
+## Mission 4: Synchronize with Updated Paper Specifications — IN PROGRESS
+
+**Objective:** Align the backtesting implementation with the precise specifications detailed in the latest version of the TradingAgents research paper (v6).
+
+**Key Clarifications from Paper v6:**
+- **Historical Data Collection Period:** January 1, 2024 to March 29, 2024 (for training/indicator calculation)
+- **Live Trading Simulation Period:** June 19, 2024 to November 19, 2024 (5-month evaluation window)
+- **Data Requirements:** Complete OHLCV (Open, High, Low, Close, Volume) and adjusted close prices
+
+**Reference:** https://arxiv.org/html/2412.20138v6
+
+**Implementation Tasks:**
+1. Download historical financial data for the corrected date ranges (Jan 1 - Mar 29, 2024 for data collection; Jun 19 - Nov 19, 2024 for trading simulation)
+2. Configure TradingAgents with updated environment settings (`.env` configuration)
+3. Execute comprehensive backtests for all three target securities (AAPL, GOOGL, AMZN)
+4. Generate comparative performance analysis between benchmark strategies and TradingAgents
+
+**Expected Deliverable:** Updated backtesting results with correct temporal alignment to paper specifications 

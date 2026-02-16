@@ -214,11 +214,11 @@ class Backtester:
             prices = {ticker: current_price}
 
             # Get TradingAgents decision
+            signal = "HOLD"
             try:
                 final_state, decision = trading_graph.propagate(ticker, date_str)
 
                 # Parse decision (expecting "BUY", "SELL", or "HOLD")
-                signal = "HOLD"
                 if "buy" in decision.lower():
                     signal = "BUY"
                 elif "sell" in decision.lower():
@@ -239,18 +239,25 @@ class Backtester:
                     if cash > 0:
                         shares = cash / current_price
                         if portfolio.buy(ticker, shares, current_price, date):
-                            print(
-                                f"[{date.date()}] BUY {shares:.2f} shares @ ${current_price:.2f}"
-                            )
+                            pass  # Will print after portfolio value is updated
 
                 elif signal == "SELL":
                     position = portfolio.get_position(ticker)
                     shares_to_sell = position.shares
                     if shares_to_sell > 0:
                         if portfolio.sell(ticker, shares_to_sell, current_price, date):
-                            print(
-                                f"[{date.date()}] SELL {shares_to_sell:.2f} shares @ ${current_price:.2f}"
-                            )
+                            pass  # Will print after portfolio value is updated
+
+            except Exception as e:
+                print(f"Error on {date.date()}: {e}")
+                signals.append(
+                    {
+                        "date": date,
+                        "signal": "ERROR",
+                        "error": str(e),
+                        "price": current_price,
+                    }
+                )
 
             except Exception as e:
                 print(f"Error on {date.date()}: {e}")
@@ -266,7 +273,18 @@ class Backtester:
             # Record snapshot after trading
             portfolio.record_snapshot(date, prices)
 
-            # Progress indicator
+            # Get portfolio value for progress reporting
+            portfolio_value = portfolio.get_total_value(prices)
+            position = portfolio.get_position(ticker)
+            shares_held = position.shares if position else 0
+
+            # Daily progress report
+            print(
+                f"[{date.date()}] Signal: {signal:>4} | Price: ${current_price:>8.2f} | "
+                f"Shares: {shares_held:>7.2f} | Portfolio: ${portfolio_value:>12,.2f}"
+            )
+
+            # Progress indicator every 5 days
             if (i + 1) % 5 == 0 or i == len(trading_days) - 1:
                 progress = (i + 1) / len(trading_days) * 100
                 print(f"Progress: {progress:.1f}% ({i + 1}/{len(trading_days)} days)")
