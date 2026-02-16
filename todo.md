@@ -163,4 +163,157 @@ Signatures in DSPy define the input/output contract for modules. This is Phase 1
 
 **Reference:** See `./experiments/dspy_migration_plan.md` Section 3, Step 1.2
 
-**Deliverable:** ✅ `tradingagents_dspy/signatures/` with 13 signatures defined and tested 
+**Deliverable:** ✅ `tradingagents_dspy/signatures/` with 13 signatures defined and tested
+
+---
+
+## Mission 7: DSPy Agent Modules - Analyst Implementations — COMPLETED
+
+**Objective:** Create DSPy agent modules that implement the analyst signatures using ReAct pattern with tool integration.
+
+**Background:**
+Now that signatures are defined (Mission 6), we need to implement the actual agent modules. Each agent will be a DSPy Module that uses the signatures and can call tools (data fetching functions) to gather information. This is Phase 2, Step 2.1 of the migration.
+
+**Implementation Tasks:**
+1. ✅ Create `tradingagents_dspy/agents/` directory structure
+2. ✅ Implement `MarketAnalyst` agent using `MarketAnalysisSignature` with ReAct
+3. ✅ Implement `SentimentAnalyst` agent using `SentimentAnalysisSignature` with ReAct
+4. ✅ Implement `NewsAnalyst` agent using `NewsAnalysisSignature` with ReAct
+5. ✅ Implement `FundamentalsAnalyst` agent using `FundamentalsAnalysisSignature` with ReAct
+6. ✅ Wrap existing tool functions (`tradingagents.agents.utils.agent_utils`) for DSPy compatibility
+7. ✅ Create test suite to verify agents can be instantiated and produce outputs (5/5 tests passing)
+
+**Technical Requirements:**
+- ✅ Use `dspy.ReAct` for tool-using agents (analysts need to fetch data)
+- ✅ Use `dspy.ChainOfThought` for simple reasoning agents
+- ✅ Each agent should be a `dspy.Module` subclass with `forward()` method
+- ✅ Agents should use the signatures from Mission 6
+- ✅ Tool wrappers should maintain compatibility with existing tool implementations
+- ✅ Support memory integration for future learning capabilities
+
+**Files Created:**
+- `tradingagents_dspy/agents/__init__.py` - Package initialization with all exports
+- `tradingagents_dspy/agents/analysts.py` - 4 analyst agents (Market, Sentiment, News, Fundamentals)
+- `tradingagents_dspy/agents/tools.py` - 10 tool wrappers with formatted output
+- `tradingagents_dspy/agents/test_analysts.py` - Test suite (5/5 tests passing)
+
+**Agents Implemented:**
+1. **MarketAnalyst** - Uses get_stock_data, get_indicators (2 tools)
+2. **SentimentAnalyst** - Uses get_news (1 tool)
+3. **NewsAnalyst** - Uses get_news, get_global_news, get_insider_transactions (3 tools)
+4. **FundamentalsAnalyst** - Uses get_fundamentals, get_balance_sheet, get_cashflow, get_income_statement (4 tools)
+
+**Key Features:**
+- All agents use `dspy.ReAct` pattern for tool integration
+- Custom tool injection supported via constructor
+- Consistent API: `agent(company: str, date: str) -> str`
+- Comprehensive docstrings and type hints
+- Error handling in tool wrappers
+- Formatted string output from tools
+
+**Tool Wrappers:**
+All 10 tool functions wrapped with error handling and formatted output:
+- get_stock_data, get_indicators
+- get_fundamentals, get_balance_sheet, get_cashflow, get_income_statement
+- get_news, get_global_news, get_insider_transactions
+
+**Test Results:**
+```
+✓ PASS: Tool Sets
+✓ PASS: Analyst Instantiation
+✓ PASS: Custom Tool Configuration
+✓ PASS: Analyst API
+✓ PASS: Analyst Docstrings
+
+Results: 5/5 tests passed
+```
+
+**Reference:** See `./experiments/dspy_migration_plan.md` Section 3, Step 2.1
+
+**Deliverable:** ✅ `tradingagents_dspy/agents/` with 4 analyst modules implemented and tested (5/5 tests passing)
+
+---
+
+## Mission 8: DSPy Agent Modules - Researcher & Risk Implementations
+
+**Objective:** Create DSPy modules for researcher debate system and risk management.
+
+**Background:**
+After implementing analyst agents (Mission 7), we need the researcher debate system (bull/bear) and risk management agents. These don't need tools but do need memory integration and iterative calling patterns.
+
+**Implementation Tasks:**
+1. Implement `BullResearcher` and `BearResearcher` with memory support
+2. Implement `ResearchManager` for synthesizing debate results
+3. Implement `Trader` agent for creating trading plans
+4. Implement risk debate agents: `AggressiveRisk`, `ConservativeRisk`, `NeutralRisk`
+5. Implement `RiskManager` for risk evaluation synthesis
+6. Implement `PortfolioManager` for final decision making
+7. Create memory integration wrapper for existing `FinancialSituationMemory`
+8. Create test suite for all researcher and risk agents
+
+**Technical Requirements:**
+- Use `dspy.ChainOfThought` for debate agents (no tools needed)
+- Integrate with existing `FinancialSituationMemory` class
+- Support iterative debate rounds (configurable via config)
+- Maintain state between debate rounds
+- All agents should be proper `dspy.Module` subclasses
+
+**Files to Create:**
+- `tradingagents_dspy/agents/researchers.py` - Bull, Bear, ResearchManager
+- `tradingagents_dspy/agents/trader.py` - Trader agent
+- `tradingagents_dspy/agents/risk.py` - Risk debate agents and RiskManager
+- `tradingagents_dspy/agents/portfolio.py` - PortfolioManager
+- `tradingagents_dspy/agents/memory.py` - Memory integration wrapper
+- `tradingagents_dspy/agents/test_researchers.py` - Test suite
+
+**Reference:** See `./experiments/dspy_migration_plan.md` Section 3, Steps 2.2-2.3
+
+**Deliverable:** Complete researcher and risk agent modules with memory integration
+
+---
+
+## Mission 9: DSPy Program - Main TradingAgentsProgram
+
+**Objective:** Create the main `TradingAgentsProgram` that orchestrates all agents into a cohesive trading decision system.
+
+**Background:**
+With all individual agents implemented (Missions 7-8), we need the main orchestration module that wires everything together. This replaces the LangGraph `TradingAgentsGraph` class.
+
+**Implementation Tasks:**
+1. Create `tradingagents_dspy/program.py` with `TradingAgentsProgram` class
+2. Implement initialization of all agent modules
+3. Implement `forward()` method with proper flow:
+   - Phase 1: Run all analysts in sequence or parallel
+   - Phase 2: Run bull/bear debate (iterative rounds)
+   - Phase 3: Research manager makes investment decision
+   - Phase 4: Trader creates trading plan
+   - Phase 5: Risk debate (aggressive/conservative/neutral)
+   - Phase 6: Risk manager evaluates
+   - Phase 7: Portfolio manager makes final decision
+4. Add configuration support (debate rounds, etc.)
+5. Add progress tracking and logging
+6. Create comprehensive test suite
+7. Create example usage script
+
+**Technical Requirements:**
+- Main class should be `TradingAgentsProgram(dspy.Module)`
+- Support both sequential and parallel analyst execution
+- Configurable debate rounds
+- Return structured output with all intermediate results
+- Compatible with backtesting framework from Missions 3-4
+- Clean API: `program(company, date) -> final_decision`
+
+**Key API:**
+```python
+program = TradingAgentsProgram(config=DEFAULT_CONFIG)
+final_decision = program(company="AAPL", date="2024-06-19")
+```
+
+**Files to Create:**
+- `tradingagents_dspy/program.py` - Main program class
+- `tradingagents_dspy/test_program.py` - Integration tests
+- `examples/dspy_example.py` - Usage example
+
+**Reference:** See `./experiments/dspy_migration_plan.md` Section 3, Step 3.1
+
+**Deliverable:** Complete `TradingAgentsProgram` ready for backtesting 
