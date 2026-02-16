@@ -60,7 +60,7 @@ The original codebase lacks any backtesting infrastructure. A comprehensive revi
 3. Conduct comparative analysis between LangGraph and DSPy implementations using the backtesting infrastructure
 4. Iterate and optimize DSPy implementation to meet or exceed LangGraph performance benchmarks
 
-## Mission 4: Synchronize with Updated Paper Specifications — IN PROGRESS
+## Mission 4: Synchronize with Updated Paper Specifications — COMPLETED
 
 **Objective:** Align the backtesting implementation with the precise specifications detailed in the latest version of the TradingAgents research paper (v6).
 
@@ -77,4 +77,69 @@ The original codebase lacks any backtesting infrastructure. A comprehensive revi
 3. Execute comprehensive backtests for all three target securities (AAPL, GOOGL, AMZN)
 4. Generate comparative performance analysis between benchmark strategies and TradingAgents
 
-**Expected Deliverable:** Updated backtesting results with correct temporal alignment to paper specifications 
+**Expected Deliverable:** Updated backtesting results with correct temporal alignment to paper specifications
+
+---
+
+## Mission 5: DSPy Foundation - Configuration Module — COMPLETED
+
+**Objective:** Begin DSPy migration by creating the foundational configuration module that initializes DSPy with the configured LLM provider.
+
+**Background:**
+The migration plan outlines Phase 1 as the foundation phase. The first critical step is establishing the DSPy configuration infrastructure to enable all subsequent agent development.
+
+**Implementation Tasks:**
+1. ✅ Create `tradingagents_dspy/config.py` module
+2. ✅ Implement `configure_dspy()` function to initialize DSPy with LLM provider from existing config
+3. ✅ Set up DSPy LM configuration using the configured provider (OpenAI, Anthropic, Google, etc.)
+4. ✅ Ensure compatibility with existing `tradingagents.llm_clients` infrastructure
+5. ✅ Add environment variable support for DSPy-specific settings
+
+**Technical Requirements:**
+- ✅ Use existing config from `tradingagents.default_config.DEFAULT_CONFIG`
+- ✅ Support all current LLM providers (OpenAI, Google, Anthropic, XAI, OpenRouter)
+- ✅ Maintain backward compatibility with LangGraph version
+- ✅ Add proper error handling for configuration issues
+
+**Files Created:**
+- `tradingagents_dspy/__init__.py` - Package initialization
+- `tradingagents_dspy/config.py` - Core configuration module
+- `tradingagents_dspy/test_config.py` - Test suite (4/4 tests passing)
+
+**Key Features:**
+- `configure_dspy(config)` - Main configuration function
+- `get_lm()` - Retrieve configured LM instance
+- `reset_dspy()` - Reset configuration for testing
+- `quick_setup()` - Quick configuration without full config dict
+- Comprehensive error handling and validation
+
+**Reference:** See `./experiments/dspy_migration_plan.md` Section 3, Step 1.1
+
+**Deliverable:** ✅ `tradingagents_dspy/config.py` with working DSPy initialization
+
+---
+
+## Mission 6: DSPy Signatures - Define Analysis Signatures
+
+**Objective:** Create DSPy signatures for all analyst types as outlined in Step 1.2 of the migration plan.
+
+**Background:**
+Signatures in DSPy define the input/output contract for modules. This is Phase 1, Step 1.2 of the migration.
+
+**Implementation Tasks:**
+1. Create `tradingagents_dspy/signatures/` directory structure
+2. Define `MarketAnalysisSignature` - company, date → market_report
+3. Define `SentimentAnalysisSignature` - company → sentiment_report
+4. Define `NewsAnalysisSignature` - company, date → news_report
+5. Define `FundamentalsAnalysisSignature` - company → fundamentals_report
+6. Create comprehensive test suite for all signatures
+
+**Technical Requirements:**
+- Use dspy.Signature class for type-safe inputs/outputs
+- Include docstrings explaining each field
+- Support the existing tool integration pattern
+- Maintain compatibility with LangGraph data structures
+
+**Reference:** See `./experiments/dspy_migration_plan.md` Section 3, Step 1.2
+
+**Deliverable:** `tradingagents_dspy/signatures/` with all analyst signatures defined and tested 
