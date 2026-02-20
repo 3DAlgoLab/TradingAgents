@@ -5,8 +5,7 @@ It provides a simple API similar to the original LangGraph version.
 """
 
 from dotenv import load_dotenv
-from tradingagents.default_config import DEFAULT_CONFIG
-from tradingagents_dspy.config import configure_dspy
+from tradingagents_dspy.config import DEFAULT_CONFIG, configure_dspy
 from tradingagents_dspy.program import TradingAgentsProgram
 
 load_dotenv()
@@ -17,12 +16,6 @@ config["deep_think_llm"] = "qwen/qwen3-coder-next"
 config["quick_think_llm"] = "qwen/qwen3-coder-next"
 config["num_debate_rounds"] = 1
 config["enable_memory"] = False
-config["data_vendors"] = {
-    "core_stock_apis": "yfinance",
-    "technical_indicators": "yfinance",
-    "fundamental_data": "yfinance",
-    "news_data": "yfinance",
-}
 
 print("Configuring DSPy...")
 configure_dspy(config)

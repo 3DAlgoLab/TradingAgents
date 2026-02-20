@@ -8,7 +8,7 @@ import dspy
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 
-from tradingagents.default_config import DEFAULT_CONFIG
+from tradingagents_dspy.config import DEFAULT_CONFIG
 from tradingagents_dspy.agents import (
     MarketAnalyst,
     SentimentAnalyst,

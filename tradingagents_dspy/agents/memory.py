@@ -1,24 +1,83 @@
 """Memory integration wrapper for DSPy agents.
 
-This module provides a wrapper around the existing FinancialSituationMemory
-class to integrate it seamlessly with DSPy agents.
+This module provides a simple in-memory storage for trading situations and outcomes,
+without depending on the main tradingagents package.
 """
 
 from typing import List, Dict, Optional
-import os
 
-try:
-    from tradingagents.agents.utils.memory import FinancialSituationMemory
-except ImportError:
-    FinancialSituationMemory = None
+
+class SimpleMemory:
+    """Simple in-memory storage for trading memories.
+
+    This is a standalone memory implementation that doesn't require
+    the main tradingagents package.
+    """
+
+    def __init__(self, name: str = "default"):
+        self.name = name
+        self.documents: List[Dict] = []
+        self.situations: List[str] = []
+        self.recommendations: List[str] = []
+
+    def add_situations(self, situations: List[tuple]) -> None:
+        """Add situations and recommendations.
+
+        Args:
+            situations: List of (situation, recommendation) tuples
+        """
+        for situation, recommendation in situations:
+            self.situations.append(situation)
+            self.recommendations.append(recommendation)
+            self.documents.append(
+                {
+                    "situation": situation,
+                    "recommendation": recommendation,
+                }
+            )
+
+    def get_memories(self, situation: str, n_matches: int = 2) -> List[Dict]:
+        """Get relevant memories (simple substring matching).
+
+        Args:
+            situation: Current situation to match against
+            n_matches: Number of matches to return
+
+        Returns:
+            List of matching documents
+        """
+        if not self.situations:
+            return []
+
+        # Simple relevance scoring based on word overlap
+        situation_words = set(situation.lower().split())
+        scores = []
+        for i, stored_situation in enumerate(self.situations):
+            stored_words = set(stored_situation.lower().split())
+            overlap = len(situation_words & stored_words)
+            scores.append((i, overlap))
+
+        # Sort by score and return top n_matches
+        scores.sort(key=lambda x: x[1], reverse=True)
+        results = []
+        for idx, score in scores[:n_matches]:
+            if score > 0:
+                results.append(self.documents[idx])
+
+        return results
+
+    def clear(self) -> None:
+        """Clear all memories."""
+        self.documents.clear()
+        self.situations.clear()
+        self.recommendations.clear()
 
 
 class MemoryWrapper:
-    """Wrapper for FinancialSituationMemory with DSPy-friendly interface.
+    """Wrapper for memory system with DSPy-friendly interface.
 
-    This class provides a simplified interface to the BM25-based memory system
-    for use with DSPy agents. It handles the creation, retrieval, and storage
-    of trading memories.
+    This class provides a simplified interface to the memory system
+    for use with DSPy agents.
 
     Example:
         >>> from tradingagents_dspy.agents.memory import MemoryWrapper
@@ -31,14 +90,9 @@ class MemoryWrapper:
 
         Args:
             name: Name identifier for this memory instance
-            config: Configuration dict (passed to FinancialSituationMemory)
+            config: Configuration dict (ignored in standalone version)
         """
-        if FinancialSituationMemory is None:
-            raise ImportError(
-                "FinancialSituationMemory not found. "
-                "Please ensure tradingagents is installed."
-            )
-        self.memory = FinancialSituationMemory(name=name, config=config or {})
+        self.memory = SimpleMemory(name=name)
 
     def get_memories(self, situation: str, n_matches: int = 2) -> str:
         """Get relevant memories for a given situation.
@@ -57,7 +111,7 @@ class MemoryWrapper:
 
         memories_str = ""
         for i, rec in enumerate(matches, 1):
-            memories_str += f"Lesson {i}: {rec['recommendation']}\n\n"
+            memories_str += f"Lesson {i}: {rec.get('recommendation', '')}\n\n"
 
         return memories_str
 
@@ -133,5 +187,6 @@ def create_memory_wrapper(
 
 __all__ = [
     "MemoryWrapper",
+    "SimpleMemory",
     "create_memory_wrapper",
 ]

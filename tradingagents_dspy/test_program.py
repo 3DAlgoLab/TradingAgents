@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from tradingagents.default_config import DEFAULT_CONFIG
+from tradingagents_dspy.config import DEFAULT_CONFIG
 from tradingagents_dspy.program import TradingAgentsProgram, TradingResult
 
 

@@ -1,20 +1,34 @@
 """DSPy configuration module for TradingAgents.
 
-This module provides DSPy initialization and configuration using the existing
-TradingAgents configuration infrastructure.
+This module provides DSPy initialization and configuration.
 """
 
 import os
 from typing import Dict, Any, Optional
 import dspy
-from tradingagents.llm_clients import create_llm_client
+
+DEFAULT_CONFIG = {
+    "llm_provider": "openai",
+    "deep_think_llm": "gpt-4o",
+    "quick_think_llm": "gpt-4o-mini",
+    "backend_url": None,
+    "openai_reasoning_effort": None,
+    "google_thinking_level": None,
+    "num_debate_rounds": 1,
+    "enable_memory": False,
+    "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "yfinance",
+        "news_data": "yfinance",
+    },
+}
 
 
 def configure_dspy(config: Optional[Dict[str, Any]] = None) -> dspy.LM:
     """Initialize DSPy with the configured LLM provider.
 
-    This function configures DSPy to use the same LLM provider and settings
-    as the existing TradingAgents LangGraph implementation.
+    This function configures DSPy to use the specified LLM provider.
 
     Args:
         config: Configuration dictionary. If None, uses DEFAULT_CONFIG.
@@ -34,17 +48,14 @@ def configure_dspy(config: Optional[Dict[str, Any]] = None) -> dspy.LM:
         RuntimeError: If DSPy initialization fails
 
     Example:
-        >>> from tradingagents.default_config import DEFAULT_CONFIG
-        >>> from tradingagents_dspy.config import configure_dspy
+        >>> from tradingagents_dspy.config import configure_dspy, DEFAULT_CONFIG
         >>> lm = configure_dspy(DEFAULT_CONFIG)
         >>> # Now DSPy is ready to use
         >>> print(dspy.settings.lm)
     """
-    # Import default config if none provided
+    # Use local default config if none provided
     if config is None:
-        from tradingagents.default_config import DEFAULT_CONFIG
-
-        config = DEFAULT_CONFIG
+        config = DEFAULT_CONFIG.copy()
 
     # Validate that we have actual configuration values
     provider = (
@@ -76,6 +87,9 @@ def configure_dspy(config: Optional[Dict[str, Any]] = None) -> dspy.LM:
 
     # Build kwargs for LM initialization
     lm_kwargs: Dict[str, Any] = {}
+
+    # Disable caching to avoid LiteLLM __annotations__ bug
+    lm_kwargs["cache"] = False
 
     # Add base_url if specified (for custom endpoints like OpenRouter)
     if base_url:

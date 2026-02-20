@@ -1,7 +1,6 @@
 """Test script for DSPy configuration module.
 
-This script verifies that the DSPy configuration module works correctly
-with the existing TradingAgents configuration.
+This script verifies that the DSPy configuration module works correctly.
 """
 
 import os
@@ -10,8 +9,13 @@ import sys
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from tradingagents.default_config import DEFAULT_CONFIG
-from tradingagents_dspy.config import configure_dspy, get_lm, reset_dspy, quick_setup
+from tradingagents_dspy.config import (
+    DEFAULT_CONFIG,
+    configure_dspy,
+    get_lm,
+    reset_dspy,
+    quick_setup,
+)
 
 
 def test_configure_dspy_with_default_config():
