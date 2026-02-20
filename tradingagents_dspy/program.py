@@ -292,6 +292,42 @@ class TradingAgentsProgram(dspy.Module):
             return self.memory.get_stats()
         return {"memory_enabled": False}
 
+    def propagate(
+        self,
+        company: str,
+        date: str,
+        verbose: bool = True,
+    ) -> tuple:
+        """Run the trading analysis (API-compatible with LangGraph version).
+
+        This method provides API compatibility with the original TradingAgentsGraph.
+
+        Args:
+            company: Stock ticker symbol
+            date: Analysis date in YYYY-MM-DD format
+            verbose: Whether to print progress updates (default: True)
+
+        Returns:
+            Tuple of (state_dict, decision_string)
+        """
+        result = self.forward(company=company, date=date, verbose=verbose)
+        state_dict = {
+            "company": company,
+            "date": date,
+            "final_decision": result.final_decision,
+            "market_report": result.market_report,
+            "sentiment_report": result.sentiment_report,
+            "news_report": result.news_report,
+            "fundamentals_report": result.fundamentals_report,
+            "bull_argument": result.bull_argument,
+            "bear_argument": result.bear_argument,
+            "investment_decision": result.investment_decision,
+            "trader_plan": result.trader_plan,
+            "risk_evaluation": result.risk_evaluation,
+        }
+        decision = result.final_decision
+        return state_dict, decision
+
 
 __all__ = [
     "TradingAgentsProgram",

@@ -26,8 +26,11 @@ pip install -r requirements.txt
 # CLI mode
 python -m cli.main
 
-# Programmatic usage
+# Programmatic usage (LangGraph version)
 python main.py
+
+# DSPy version (alternative implementation)
+python main_dspy.py
 
 # As installed package
 tradingagents
@@ -43,6 +46,24 @@ uv run pytest test.py
 
 # Run with verbose output
 uv run pytest -v
+
+# Run a specific test function
+uv run pytest test.py::test_function_name -v
+
+# Run test script directly (project uses test.py for ad-hoc testing)
+uv run python test.py
+```
+
+### Code Quality
+```bash
+# Format code with ruff (if installed)
+uv run ruff format .
+
+# Lint with ruff (if installed)
+uv run ruff check .
+
+# Type checking with mypy (if installed)
+uv run mypy tradingagents
 ```
 
 ### Environment Setup

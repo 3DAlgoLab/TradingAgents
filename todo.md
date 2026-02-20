@@ -339,7 +339,7 @@ With all individual agents implemented (Missions 7-8), we need the main orchestr
 **Files Created:**
 - `tradingagents_dspy/program.py` - Main program class with 7-phase pipeline
 - `tradingagents_dspy/test_program.py` - Integration tests (6/6 passing)
-- `examples/dspy_example.py` - Usage example
+- `main_dspy.py` - Main entry point (NEW)
 - `tradingagents_dspy/__init__.py` - Updated with program exports
 
 **Key Features:**
@@ -365,3 +365,52 @@ Results: 6/6 tests passed
 **Reference:** See `./experiments/dspy_migration_plan.md` Section 3, Step 3.1
 
 **Deliverable:** ✅ Complete `TradingAgentsProgram` ready for backtesting (6/6 tests passing) 
+
+
+## Mission 10: Check a basic functionality of DSPy based program — COMPLETED
+**Objective:** Create an equivalent `main.py` for the DSPy version.
+
+**Background:**
+The original LangGraph version has `main.py` as its entry point. The DSPy version needed a similar entry point for easy testing and execution.
+
+**Implementation Tasks:**
+1. ✅ Create `main_dspy.py` at project root - equivalent entry point to `main.py`
+2. ✅ Add `propagate()` method to `TradingAgentsProgram` for API compatibility with LangGraph version
+3. ✅ Ensure same configuration pattern as original (`DEFAULT_CONFIG.copy()`)
+4. ✅ Match the return signature: `(state_dict, decision_string)`
+5. ✅ Run basic functionality test to verify the program works
+
+**Files Created/Modified:**
+- `main_dspy.py` - Main entry point (NEW)
+- `tradingagents_dspy/program.py` - Added `propagate()` method for API compatibility
+
+**Key Features:**
+- Same API as LangGraph version: `ta.propagate(company, date)`
+- Same configuration pattern
+- Returns `(state_dict, decision)` tuple
+- Verbose mode enabled by default
+
+**Usage:**
+```bash
+# Run DSPy version
+python main_dspy.py
+
+# Or run LangGraph version
+python main.py
+```
+
+**Alternative (using TradingAgentsProgram directly):**
+```bash
+python -c "
+from tradingagents_dspy.config import configure_dspy
+from tradingagents_dspy.program import TradingAgentsProgram
+from tradingagents.default_config import DEFAULT_CONFIG
+
+configure_dspy()
+config = DEFAULT_CONFIG.copy()
+config['num_debate_rounds'] = 1
+ta = TradingAgentsProgram(config=config)
+result = ta(company='AAPL', date='2024-06-19', verbose=True)
+print(result.final_decision)
+"
+``` 
