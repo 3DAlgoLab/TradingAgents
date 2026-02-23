@@ -50,7 +50,7 @@ ta = TradingAgentsGraph(debug=True, config=config)
 # Returns: (final_state_dict, trade_decision)
 _, decision = ta.propagate("NVDA", "2026-02-13")
 
-# Print the final trading decision (BUY, SELL, or HOLD with reasoning)
+print("\nThe final trading decision (BUY, SELL, or HOLD with reasoning):")
 print(decision)
 
 # Optional: Reflection and learning feature (currently commented out)
